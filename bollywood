@@ -1,0 +1,65 @@
+import pandas as pd
+import numpy as np
+from sklearn.linear_model import LinearRegression
+from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error, r2_score
+import matplotlib.pyplot as plt
+
+df = pd.read_csv('D:/Downloads/Other/Data/bollywood2.csv')
+df.head(10)
+df.shape
+df.isnull().sum()
+daytime = pd.Series(df['Release Date'])
+daytime
+dname = pd.to_datetime(daytime)
+df['Release Date'] = dname
+df['Day'] = df['Release Date'].dt.day
+df['Month'] = df['Release Date'].dt.month
+df['Year'] = df['Release Date'].dt.year
+group = df.groupby('ReleaseTime')
+group.size()
+relti = {'FS':1,'HS':2,'LW':3,'N':4}
+df['ReleaseTime'] = df['ReleaseTime'].map(relti)
+genr = {' Drama':1,'Action':2,'Comedy':3,'Romance':4,'Thriller':5}
+df['Genre'] = df['Genre'].map(genr)
+#Linear Regression
+X = df[["ReleaseTime","Genre","Budget","YoutubeViews","YoutubeLikes","YoutubeDislikes",'Year','Month','Day']]
+y = df["BoxOfficeCollection"]
+#Need to use date
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=43)
+lin_reg = LinearRegression()
+lin_reg.fit(X_train, y_train)
+y_pred = lin_reg.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+#print(f'Mean Squared Error: {mse:.2f}')
+print(f'R² Score: {r2:.2f}')
+R² Score: 0.61
+#Polynomial Regression
+from sklearn.preprocessing import PolynomialFeatures
+X = df[["ReleaseTime","Genre","Budget","YoutubeViews","YoutubeLikes","YoutubeDislikes",'Year','Month','Day']]
+y = df["BoxOfficeCollection"]
+poly = PolynomialFeatures(degree=2)
+X_poly = poly.fit_transform(X)
+X_train, X_test, y_train, y_test = train_test_split(X_poly, y, test_size=0.3, random_state=43)
+model = LinearRegression()
+model.fit(X_train, y_train)
+y_pred = model.predict(X_test)
+mse = mean_squared_error(y_test, y_pred)
+r2 = r2_score(y_test, y_pred)
+print(f'Mean Squared Error: {mse:.2f}')
+print(f'R² Score: {r2:.2f}')
+Mean Squared Error: 17846.28
+R² Score: -1.63
+#K Fold Cross Validation Score
+from sklearn.model_selection import KFold, cross_val_score
+from sklearn.linear_model import LinearRegression
+X = df[["ReleaseTime","Genre","Budget","YoutubeViews","YoutubeLikes","YoutubeDislikes"]]
+y = df["BoxOfficeCollection"]
+lin_reg = LinearRegression()
+kf = KFold(n_splits=5, shuffle=True, random_state=44)
+scores = cross_val_score(lin_reg, X, y, cv=kf, scoring='r2')
+print(f'Cross-Validation R² Scores: {scores}')
+print(f'Average R² Score: {scores.mean():.2f}')
+Cross-Validation R² Scores: [0.26141741 0.50122904 0.58788792 0.53815314 0.11214722]
+Average R² Score: 0.40
