@@ -22,6 +22,7 @@ relti = {'FS':1,'HS':2,'LW':3,'N':4}
 df['ReleaseTime'] = df['ReleaseTime'].map(relti)
 genr = {' Drama':1,'Action':2,'Comedy':3,'Romance':4,'Thriller':5}
 df['Genre'] = df['Genre'].map(genr)
+
 #Linear Regression
 X = df[["ReleaseTime","Genre","Budget","YoutubeViews","YoutubeLikes","YoutubeDislikes",'Year','Month','Day']]
 y = df["BoxOfficeCollection"]
@@ -35,6 +36,7 @@ r2 = r2_score(y_test, y_pred)
 #print(f'Mean Squared Error: {mse:.2f}')
 print(f'R² Score: {r2:.2f}')
 R² Score: 0.61
+
 #Polynomial Regression
 from sklearn.preprocessing import PolynomialFeatures
 X = df[["ReleaseTime","Genre","Budget","YoutubeViews","YoutubeLikes","YoutubeDislikes",'Year','Month','Day']]
@@ -51,6 +53,7 @@ print(f'Mean Squared Error: {mse:.2f}')
 print(f'R² Score: {r2:.2f}')
 Mean Squared Error: 17846.28
 R² Score: -1.63
+
 #K Fold Cross Validation Score
 from sklearn.model_selection import KFold, cross_val_score
 from sklearn.linear_model import LinearRegression
